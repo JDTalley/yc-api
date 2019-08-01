@@ -3,6 +3,8 @@ var router = express.Router();
 var Campground = require("../models/campground");
 var middleware = require("../middleware");
 
+var path = "/yelpcamp";
+
 //INDEX
 router.get("/", function(req, res){
     //Get all campgrounds from DB
@@ -30,7 +32,7 @@ router.post("/", function(req, res){
         if(err){
             console.log(err);
         } else {
-            res.redirect("/campgrounds");
+            res.redirect(path + "/campgrounds");
         }
     });
 });
@@ -66,9 +68,9 @@ router.get("/:id/edit", middleware.checkCampgroundOwnership, function(req, res){
 router.put("/:id", middleware.checkCampgroundOwnership, function(req, res){
     Campground.findByIdAndUpdate(req.params.id, req.body.campground, function(err, updatedCampground){
         if(err){
-            res.redirect("/campgrounds");
+            res.redirect(path+ "/campgrounds");
         } else {
-            res.redirect("/campgrounds/" + req.params.id);
+            res.redirect(path + "/campgrounds/" + req.params.id);
         }
     });
 });
@@ -77,9 +79,9 @@ router.put("/:id", middleware.checkCampgroundOwnership, function(req, res){
 router.delete("/:id", middleware.checkCampgroundOwnership, function(req, res){
     Campground.findByIdAndRemove(req.params.id, function(err){
         if(err){
-            res.redirect("/campgrounds");
+            res.redirect(path + "/campgrounds");
         } else {
-            res.redirect("/campgrounds");
+            res.redirect(path + "/campgrounds");
         }
     });
 });

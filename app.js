@@ -1,24 +1,24 @@
-var express       = require("express"),
-    app           = express(),
-    bodyParser    = require("body-parser"),
-    mongoose      = require("mongoose"),
-    flash         = require("connect-flash"),
-    passport      = require("passport"),
-    LocalStrategy = require("passport-local"),
-    methodOverride = require("method-override"),
-    Campground    = require("./models/campground"),
-    Comment       = require("./models/comment"),
-    User          = require("./models/user"),
-    seedDB        = require("./seeds");
+var express          = require("express"),
+    app              = express(),
+    bodyParser       = require("body-parser"),
+    mongoose         = require("mongoose"),
+    flash            = require("connect-flash"),
+    passport         = require("passport"),
+    LocalStrategy    = require("passport-local"),
+    methodOverride   = require("method-override"),
+    Campground       = require("./models/campground"),
+    Comment          = require("./models/comment"),
+    User             = require("./models/user"),
+    seedDB           = require("./seeds");
     
 var commentRoutes    = require("./routes/comments"),
     campgroundRoutes = require("./routes/campgrounds"),
-    indexRoutes       = require("./routes/index");
+    indexRoutes      = require("./routes/index");
 
 mongoose.connect(process.env.MDBYCURL, { useNewUrlParser: true });
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
-app.use(express.static(__dirname + "/public"));
+app.use(express.static(__dirname + "/yelpcamp/bc-yelpcamp/public"));
 app.use(methodOverride("_method"));
 app.use(flash());
 // seedDB();  //seed the database
@@ -43,9 +43,9 @@ app.use(function(req, res, next){
 });
 
 //Requiring Routes
-app.use("", indexRoutes);
-app.use("campgrounds/", campgroundRoutes);
-app.use("campgrounds/:id/comments", commentRoutes);
+app.use("/", indexRoutes);
+app.use("/campgrounds/", campgroundRoutes);
+app.use("/campgrounds/:id/comments", commentRoutes);
 
 app.listen(8081, "localhost", function(){
     console.log("The YelpCamp Server has started.");
