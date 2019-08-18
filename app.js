@@ -9,23 +9,28 @@ var express          = require("express"),
     Campground       = require("./models/campground"),
     Comment          = require("./models/comment"),
     User             = require("./models/user"),
-    seedDB           = require("./seeds");
+    seedDB           = require("./seeds"),
+    config           = require("./config");
+
+//Add Routes
     
 var commentRoutes    = require("./routes/comments"),
     campgroundRoutes = require("./routes/campgrounds"),
     indexRoutes      = require("./routes/index");
 
-mongoose.connect(process.env.MDBYCURL, { useNewUrlParser: true });
+var connectionString = "mongodb+srv://" + config.db.user + ":" + config.db.pass + "@" + config.db.url;
+
+mongoose.connect(connectionString, { useNewUrlParser: true });
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
-app.use(express.static(__dirname + "/yelpcamp/bc-yelpcamp/public"));
+app.use(express.static(__dirname + "./public"));
 app.use(methodOverride("_method"));
 app.use(flash());
-// seedDB();  //seed the database
+//seedDB();  //seed the database
 
 // PASSPORT CONFIGURATION
 app.use(require("express-session")({
-    secret: "Secret Sauce",
+    secret: config.app.secret,
     resave: false,
     saveUninitialized: false
 }));
@@ -47,6 +52,6 @@ app.use("/", indexRoutes);
 app.use("/campgrounds/", campgroundRoutes);
 app.use("/campgrounds/:id/comments", commentRoutes);
 
-app.listen(8081, "localhost", function(){
+app.listen(config.app.port, "localhost", function(){
     console.log("The YelpCamp Server has started.");
 });
