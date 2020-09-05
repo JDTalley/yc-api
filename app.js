@@ -14,9 +14,10 @@ var express          = require("express"),
 
 //Add Routes
     
-var commentRoutes    = require("./routes/comments"),
-    campgroundRoutes = require("./routes/campgrounds"),
-    indexRoutes      = require("./routes/index");
+var commentRoutes       = require("./routes/comments"),
+    campgroundRoutes    = require("./routes/campgrounds"),
+    indexRoutes         = require("./routes/index"),
+    apiCampgroundRoutes = require("./routes/api/campgrounds-api");
 
 var connectionString = "mongodb+srv://" + config.db.user + ":" + config.db.pass + "@" + config.db.url;
 
@@ -51,6 +52,9 @@ app.use(function(req, res, next){
 app.use("/", indexRoutes);
 app.use("/campgrounds/", campgroundRoutes);
 app.use("/campgrounds/:id/comments", commentRoutes);
+
+//Requiring API Routes
+app.use("/api/campgrounds/", apiCampgroundRoutes);
 
 app.listen(config.app.port, "localhost", function(){
     console.log("The YelpCamp Server has started.");

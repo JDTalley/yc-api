@@ -8,7 +8,9 @@ var Campground = require("../models/campground");
 var Comment = require("../models/comment");
 var middleware = require("../middleware");
 
-var path = "/yelpcamp";
+// Configure Sub Path
+//var path = "/yelpcamp";
+var path = "";
 
 //NEW COMMENT
 router.get("/new", middleware.isLoggedIn, function(req, res){
