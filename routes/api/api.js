@@ -2,13 +2,15 @@ var express = require("express");
 var router = express.Router();
 var Campground = require("../../models/campground");
 var middleware = require("../../middleware");
+var passport = require("passport");
+var User = require("../../models/user");
 
-// Configure Sub Path
-//var path = "/yelpcamp";
-var path = "";
+/******
+ * Campgrounds
+ */
 
 //INDEX
-router.get("/", function(req, res){
+router.get("/campgrounds", function(req, res){
     //Get all campgrounds from DB
     Campground.find({},function(err, allCampgrounds){
         if(err){
@@ -16,13 +18,12 @@ router.get("/", function(req, res){
             res.send(err);
         } else {
             res.send({campgrounds:allCampgrounds});
-            //res.render("campgrounds/index",{campgrounds:allCampgrounds});
         }
     });
 });
 
 //CREATE
-router.post("/", function(req, res){
+router.post("/campgrounds", function(req, res){
     var name = req.body.name;
     var image = req.body.image;
     var desc = req.body.description;
@@ -38,64 +39,75 @@ router.post("/", function(req, res){
             res.send(err);
         } else {
             res.send({campground: newlyCreated._id});
-            //res.redirect(path + "/campgrounds");
         }
     });
 });
 
-// NEW
-// Not used in API
-//router.get("/new", middleware.isLoggedIn, function(req, res){
-//   res.render("campgrounds/new"); 
-//});
-
 //SHOW
-router.get("/:id", function(req, res){
+router.get("/campgrounds/:id", function(req, res){
     Campground.findById(req.params.id).populate("comments").exec(function(err, foundCampground){
         if(err){
             console.log(err);
             res.send(err);
         } else {
             res.send({campground: foundCampground});
-            //res.render("campgrounds/show", {campground: foundCampground});
         }
     });
 });
 
-//EDIT CAMPGROUND ROUTE
-// Not used in API
-// router.get("/:id/edit", middleware.checkCampgroundOwnership, function(req, res){
-//     Campground.findById(req.params.id, function(err, foundCampground){
-//         if(err){
-//             res.redirect("back");
-//         } else {
-//             res.render("campgrounds/edit", {campground: foundCampground});
-//         }
-//     });
-// });
-
 //UPDATE CAMPGROUND ROUTE
-router.put("/:id", middleware.checkCampgroundOwnership, function(req, res){
+router.put("/campgrounds/:id", middleware.checkCampgroundOwnership, function(req, res){
     Campground.findByIdAndUpdate(req.params.id, req.body.campground, function(err, updatedCampground){
         if(err){
             res.send(err);
         } else {
             res.send({campground: updatedCampground._id});
-            //res.redirect(path + "/campgrounds/" + req.params.id);
         }
     });
 });
 
 //DESTROY CAMPGROUND ROUTE
-router.delete("/:id", middleware.checkCampgroundOwnership, function(req, res){
-    Campground.findByIdAndRemove(req.params.id, function(err){
+router.delete("/campgrounds/:id", middleware.checkCampgroundOwnership, function(req, res){
+    Campground.findByIdAndRemove(req.params.id, function(err, deletedCampground){
         if(err){
             res.send(err);
         } else {
             res.send({campground: deletedCampground._id});
-            //res.redirect(path + "/campgrounds");
         }
     });
 });
+
+
+/*******
+ * Registration and Logins
+ */
+
+ //handle sign up logic
+router.post("/register", function(req, res){
+    var newUser = new User({username: req.body.username});
+    User.register(newUser, req.body.password, function(err, user){
+        if(err){
+            return res.render("register", {"error": err.message});
+        }
+        passport.authenticate("local")(req, res, function(){
+            req.flash("success", "Welcome to YelpCamp " + user.username);
+            res.redirect(path + "/campgrounds");
+        });
+    });
+});
+
+ // handling login logic
+router.post("/login", passport.authenticate("local"), 
+    function(req, res){
+        res.send(req.user.username)
+    }
+);
+
+// logout route
+router.get("/logout", function(req, res){
+    req.logout();
+});
+
+
 
 module.exports = router;
